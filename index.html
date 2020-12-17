@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Add React in One Minute</title>
+    <link rel="stylesheet" href="index.css"/>
+    <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.25.0/babel.min.js"></script>
+
+    <!-- Load react-table -->
+ 
+    <script src="https://unpkg.com/react-table@7.6.2/dist/react-table.development.js" crossorigin></script>
+
+
+
+
+    <script>
+        var useState = React.useState
+    </script>
+    <script>
+        var useEffect = React.useEffect
+    </script>
+    <script>
+        var useMemo = React.useMemo
+    </script>
+    <script>
+        var useTable = ReactTable.useTable
+    </script>
+
+  </head>
+  <body>
+
+    <!-- We will put our React component inside this div. -->
+    <div id="root"></div>
+
+    
+    <script type="text/babel">   
+  
+    function MyComponent(){
+    const [items, setItems] = useState([]);
+
+    const columns = useMemo( () => [
+      {
+        Header: "Title",
+        accessor: "title"
+      },
+      {
+        Header: "Description",
+        accessor: "description"
+      }
+    ], [])
+
+    useEffect (() => {
+        fetch("http://84.201.184.154:5075/rfkit/list/1")
+        .then(res => res.json())
+        .then(result => (
+            setItems(result.dataList)
+        ));
+    }, [])
+
+
+    const tableInstance = useTable({
+        columns,
+        data: items
+    })
+    const {getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = tableInstance;
+
+
+    return(
+        <div className='MyComponent'>
+            <table  {...getTableProps()}>
+            <thead>
+                {
+                    headerGroups.map(headerGroup => (
+                        <tr {...headerGroup.getHeaderGroupProps()}>
+                            {
+                                headerGroup.headers.map( column => (
+                                    <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+                                ))
+                            }                        
+                    </tr>
+                    ))
+                }              
+            </thead>
+            <tbody {...getTableBodyProps()}>
+            {
+                rows.map(row => {
+                    prepareRow(row)
+                    return (
+                        <tr {...row.getRowProps()}>
+                        {
+                            row.cells.map(cell => {
+                                return <th {...cell.getCellProps()}>{cell.render('Cell')}</th>
+                            })
+                        }
+                        </tr>
+                    )
+                })
+            }
+            </tbody>
+        </table>
+        </div>
+    );
+    }
+
+
+      ReactDOM.render(
+        <MyComponent/>,
+        document.getElementById('root')
+      );
+     </script>
+  </body>
+</html>
